@@ -1,0 +1,81 @@
+{
+	"root_dir": ".",
+	"tmp": true,
+	"cleanup_tmp": false,
+	"exclude": {
+		"dirs": [
+			"data",
+			"dist",
+			"node_modules",
+			"tmp"
+		],
+		"files": [],
+		"regex": [
+			"^\\.?(\\/?|\\\\?)(?:\\w+(\\/|\\\\))*(\\.\\w+)$",
+			"^.+\\.sqlite$",
+			"^.+\\.wal$",
+			"^.+\\.shm$"
+		]
+	},
+	"watchers": [
+		{
+			"name": "tailwind watcher",
+			"file_types": [".css"],
+			"file_names": [],
+			"exclude": {
+				"dirs": ["static/css"],
+				"files": [],
+				"regex": []
+			},
+			"tasks": ["tailwindcss -i ./assets/css/input.css -o ./static/css/style.css"],
+			"service": "",
+			"run_on_start": true,
+			"max_task_time": 2000,
+			"max_service_timeout": 5000,
+			"debounce_delay": 200,
+			"refresh_delay": 1000,
+			"trigger_refresh": true
+		},
+		{
+			"name": "templ watcher",
+			"file_types": [".templ"],
+			"file_names": [],
+			"exclude": {
+				"dirs": [],
+				"files": [],
+				"regex": []
+			},
+			"tasks": ["templ generate"],
+			"service": "",
+			"run_on_start": true,
+			"max_task_time": 2000,
+			"max_service_timeout": 5000,
+			"debounce_delay": 200,
+			"refresh_delay": 200,
+			"trigger_refresh": false
+		},
+		{
+			"name": "go watcher",
+			"file_types": [".go"],
+			"file_names": [],
+			"exclude": {
+				"dirs": [],
+				"files": [],
+				"regex": ["_test.go"]
+			},
+			"tasks": ["go build -o ./tmp/main dev ./cmd/docpile/main.go"],
+			"service": "./tmp/main",
+			"run_on_start": true,
+			"max_task_time": 2000,
+			"max_service_timeout": 5000,
+			"debounce_delay": 200,
+			"refresh_delay": 1000,
+			"trigger_refresh": true
+		}
+	],
+	"proxy": {
+		"enabled": true,
+		"app_port": 8000,
+		"proxy_port": 8001
+	}
+}
