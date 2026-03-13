@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"maps"
 	"os"
+	"slices"
 )
 
 var supportedLoggerFormats = map[string]struct{}{
@@ -25,8 +26,14 @@ const (
 )
 
 var (
-	ErrLoggerFormat = fmt.Errorf("logger format not supported, use any of %v", maps.Keys(supportedLoggerFormats))
-	ErrLoggerLevel  = fmt.Errorf("logger level not supported, use any of %v", maps.Keys(supportedLoggerLevels))
+	ErrLoggerFormat = fmt.Errorf(
+		"logger format not supported, use any of %v",
+		slices.Collect(maps.Keys(supportedLoggerFormats)),
+	)
+	ErrLoggerLevel = fmt.Errorf(
+		"logger level not supported, use any of %v",
+		slices.Collect(maps.Keys(supportedLoggerLevels)),
+	)
 )
 
 type LoggerConfig struct {
