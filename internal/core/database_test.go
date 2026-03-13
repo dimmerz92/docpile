@@ -12,21 +12,23 @@ func TestDatabaseConfig(t *testing.T) {
 		err  error
 	}{
 		{name: "valid sqlite", cfg: core.DatabaseConfig{Driver: "sqlite", DSN: ":memory:"}},
-		{name: "missing dsn", cfg: core.DatabaseConfig{Driver: "sqlite"}},
-		{name: "invalid dsn", cfg: core.DatabaseConfig{Driver: "sqlite3"}},
-		{name: "missing driver", cfg: core.DatabaseConfig{DSN: ":memory:"}},
+		{name: "missing dsn", cfg: core.DatabaseConfig{Driver: "sqlite"}, err: core.ErrDatabaseDSN},
+		{name: "invalid driver", cfg: core.DatabaseConfig{Driver: "sqlite3"}, err: core.ErrDatabaseDriver},
+		{name: "missing driver", cfg: core.DatabaseConfig{DSN: ":memory:"}, err: core.ErrDatabaseDriver},
 	}
 
 	for _, test := range tests {
-		err := test.cfg.Validate()
-		if err != test.err {
-			t.Errorf("expected %v, got %v", test.err, err)
-		}
+		t.Run(test.name, func(t *testing.T) {
+			err := test.cfg.Validate()
+			if err != test.err {
+				t.Errorf("expected %v, got %v", test.err, err)
+			}
+		})
 	}
 }
 
 const (
-	sqliteQuery = "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'test_table';"
+	sqliteQuery = "SELECT 1 FROM sqlite_master WHERE type='table' AND name='test_table';"
 )
 
 func TestDatabase(t *testing.T) {
@@ -34,7 +36,7 @@ func TestDatabase(t *testing.T) {
 		name string
 		cfg  core.DatabaseConfig
 	}{
-		{name: "sqlite", cfg: core.DatabaseConfig{Driver: "sqlite", DSN: ":memory:"}},
+		{name: "sqlite", cfg: core.DatabaseConfig{Driver: "sqlite", DSN: ":memory:", Test: true}},
 	}
 
 	for _, test := range tests {
@@ -52,14 +54,11 @@ func TestDatabase(t *testing.T) {
 
 			var query string
 			switch test.cfg.Driver {
-			case sqliteQuery:
+			case "sqlite":
 				query = sqliteQuery
 			}
 
-			row := db.QueryRowContext(t.Context(), query)
-			if row.Err() != nil {
-				t.Fatalf("failed to query db: %v", err)
-			}
+			row := db.QueryRow(query)
 
 			var got int
 			err = row.Scan(&got)
